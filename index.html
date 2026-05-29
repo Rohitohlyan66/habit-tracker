@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meri Habits</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0f;
+    --bg2: #141417;
+    --bg3: #1c1c21;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #f0eff4;
+    --muted: rgba(240,239,244,0.45);
+    --dim: rgba(240,239,244,0.2);
+    --accent: #7c6af7;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --coral: #fb7185;
+    --teal: #2dd4bf;
+    --blue: #60a5fa;
+    --pink: #f472b6;
+  }
+
+  html { background: var(--bg); }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* Grid bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,106,247,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,106,247,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow blob */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -20%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(124,106,247,0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7c6af7, #a78bfa);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .brand {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .brand span { color: var(--accent2); }
+
+  .header-right {
+    text-align: right;
+  }
+
+  .date-text {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .streak-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(251,191,36,0.12);
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--amber);
+    margin-top: 6px;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .stat-card.purple::before { background: linear-gradient(90deg, #7c6af7, #a78bfa); }
+  .stat-card.green::before { background: linear-gradient(90deg, #059669, #34d399); }
+  .stat-card.amber::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
+
+  .stat-card:hover { border-color: var(--border2); }
+
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+
+  .progress-outer {
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+
+  .progress-inner {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #7c6af7, #a78bfa);
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Add habit */
+  .add-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+
+  .add-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .add-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .add-input {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .add-input::placeholder { color: var(--dim); }
+  .add-input:focus { border-color: rgba(124,106,247,0.5); box-shadow: 0 0 0 3px rgba(124,106,247,0.1); }
+
+  .emoji-select {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 10px;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .emoji-select:focus { border-color: rgba(124,106,247,0.5); }
+
+  .add-btn {
+    background: linear-gradient(135deg, #7c6af7, #a78bfa);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .add-btn:hover { opacity: 0.9; }
+  .add-btn:active { transform: scale(0.97); }
+
+  /* Week header */
+  .week-header {
+    display: grid;
+    grid-template-columns: 1fr repeat(7, 38px);
+    gap: 6px;
+    padding: 0 20px;
+    margin-bottom: 8px;
+  }
+
+  .day-col {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-align: center;
+  }
+
+  .day-col.today { color: var(--accent2); font-weight: 600; }
+
+  /* Habits */
+  .habit-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .habit-row {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 20px;
+    display: grid;
+    grid-template-columns: 1fr repeat(7, 38px);
+    gap: 6px;
+    align-items: center;
+    transition: border-color 0.2s, transform 0.15s;
+    animation: slideIn 0.25s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .habit-row:hover { border-color: var(--border2); }
+
+  .habit-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+  }
+
+  .habit-emoji { font-size: 20px; flex-shrink: 0; }
+
+  .habit-texts { overflow: hidden; }
+
+  .habit-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .habit-streak-text {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .habit-streak-text.active { color: var(--amber); }
+
+  .check-wrap { display: flex; align-items: center; justify-content: center; }
+
+  .check-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.15s;
+    color: transparent;
+  }
+
+  .check-btn:hover { border-color: var(--border2); background: var(--bg3); }
+
+  .check-btn.done {
+    border-color: transparent;
+    color: #fff;
+  }
+
+  .check-btn.is-today:not(.done) {
+    border-color: rgba(124,106,247,0.5);
+    box-shadow: 0 0 0 2px rgba(124,106,247,0.12);
+  }
+
+  .check-btn.done::after { content: '✓'; }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 4px;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+    margin-left: 4px;
+    flex-shrink: 0;
+  }
+
+  .habit-row:hover .delete-btn { opacity: 1; }
+  .delete-btn:hover { color: var(--coral); }
+
+  /* Empty */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    color: var(--muted);
+  }
+
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state .empty-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .empty-state .empty-sub { font-size: 13px; color: var(--muted); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">🌱</div>
+      <div>
+        <div class="brand">Meri <span>Habits</span></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="date-text" id="date-label"></div>
+      <div class="streak-chip">🔥 <span id="top-streak">0</span> din ki streak</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card purple">
+      <div class="stat-val" id="today-val">0/0</div>
+      <div class="stat-label">Aaj complete</div>
+      <div class="progress-outer"><div class="progress-inner" id="prog-bar" style="width:0%"></div></div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-val" id="week-val">0%</div>
+      <div class="stat-label">Is hafte rate</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-val" id="total-val">0</div>
+      <div class="stat-label">Total habits</div>
+    </div>
+  </div>
+
+  <div class="add-section">
+    <div class="add-title">+ Nayi habit jodo</div>
+    <div class="add-row">
+      <input class="add-input" id="habit-input" type="text" placeholder="Habit ka naam likho..." maxlength="40" />
+      <select class="emoji-select" id="emoji-pick">
+        <option value="💧">💧 Paani</option>
+        <option value="🏃">🏃 Exercise</option>
+        <option value="📖">📖 Padhna</option>
+        <option value="🧘">🧘 Meditation</option>
+        <option value="😴">😴 Neend</option>
+        <option value="🥗">🥗 Diet</option>
+        <option value="✍️">✍️ Journal</option>
+        <option value="💊">💊 Medicine</option>
+        <option value="🎯">🎯 Focus</option>
+        <option value="⭐">⭐ Custom</option>
+      </select>
+      <button class="add-btn" onclick="addHabit()">+ Add karo</button>
+    </div>
+  </div>
+
+  <div class="week-header" id="week-header">
+    <div></div>
+  </div>
+
+  <div class="habit-list" id="habit-list"></div>
+
+</div>
+
+<script>
+  const COLORS = ['#7c6af7','#34d399','#fb7185','#fbbf24','#60a5fa','#f472b6','#2dd4bf','#a78bfa'];
+  const DAY_SHORT = ['Rvi','Som','Mng','Bdh','Brh','Shk','Shn'];
+  const today = new Date();
+
+  function getDateKey(offset) {
+    const d = new Date(today);
+    d.setDate(d.getDate() + offset);
+    return d.toISOString().slice(0, 10);
+  }
+
+  // Date label
+  document.getElementById('date-label').textContent = today.toLocaleDateString('hi-IN', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+
+  // Build week header
+  const wh = document.getElementById('week-header');
+  for (let i = -6; i <= 0; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i);
+    const div = document.createElement('div');
+    div.className = 'day-col' + (i === 0 ? ' today' : '');
+    div.textContent = i === 0 ? 'Aaj' : DAY_SHORT[d.getDay()];
+    wh.appendChild(div);
+  }
+
+  let habits = [];
+  try { habits = JSON.parse(localStorage.getItem('mh_habits_v1') || '[]'); } catch(e) {}
+
+  if (!habits.length) {
+    habits = [
+      { id: 1, name: '8 glass paani peena', emoji: '💧', color: COLORS[0], logs: {} },
+      { id: 2, name: 'Exercise karna', emoji: '🏃', color: COLORS[1], logs: {} },
+      { id: 3, name: 'Kitaab padhna', emoji: '📖', color: COLORS[2], logs: {} },
+    ];
+    save();
+  }
+
+  function save() { try { localStorage.setItem('mh_habits_v1', JSON.stringify(habits)); } catch(e) {} render(); }
+
+  function addHabit() {
+    const inp = document.getElementById('habit-input');
+    const name = inp.value.trim();
+    if (!name) { inp.focus(); return; }
+    const emoji = document.getElementById('emoji-pick').value;
+    habits.push({ id: Date.now(), name, emoji, color: COLORS[habits.length % COLORS.length], logs: {} });
+    inp.value = '';
+    save();
+  }
+
+  document.getElementById('habit-input').addEventListener('keydown', e => { if (e.key === 'Enter') addHabit(); });
+
+  function toggle(id, offset) {
+    const h = habits.find(x => x.id === id);
+    const key = getDateKey(offset);
+    h.logs[key] = !h.logs[key];
+    save();
+  }
+
+  function removeHabit(id) {
+    habits = habits.filter(x => x.id !== id);
+    save();
+  }
+
+  function getStreak(h) {
+    let s = 0;
+    for (let i = 0; i >= -365; i--) { if (h.logs[getDateKey(i)]) s++; else break; }
+    return s;
+  }
+
+  function render() {
+    const list = document.getElementById('habit-list');
+
+    if (!habits.length) {
+      list.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">🌱</div>
+        <div class="empty-title">Koi habit nahi abhi!</div>
+        <div class="empty-sub">Upar se apni pehli habit add karo</div>
+      </div>`;
+      document.getElementById('today-val').textContent = '0/0';
+      document.getElementById('prog-bar').style.width = '0%';
+      document.getElementById('week-val').textContent = '0%';
+      document.getElementById('total-val').textContent = '0';
+      document.getElementById('top-streak').textContent = '0';
+      return;
+    }
+
+    let todayDone = 0, weekDone = 0, weekTotal = 0;
+
+    list.innerHTML = habits.map(h => {
+      const streak = getStreak(h);
+      if (h.logs[getDateKey(0)]) todayDone++;
+      for (let i = -6; i <= 0; i++) { weekTotal++; if (h.logs[getDateKey(i)]) weekDone++; }
+
+      const cells = Array.from({length: 7}, (_, i) => {
+        const offset = i - 6;
+        const done = !!h.logs[getDateKey(offset)];
+        const isToday = offset === 0;
+        const cls = 'check-btn' + (done ? ' done' : '') + (isToday ? ' is-today' : '');
+        const bgStyle = done ? `background:${h.color};` : '';
+        return `<div class="check-wrap"><button class="${cls}" style="${bgStyle}" onclick="toggle(${h.id},${offset})" aria-label="Toggle ${isToday?'aaj':'din'}"></button></div>`;
+      }).join('');
+
+      const streakLabel = streak > 0 ? `🔥 ${streak} din ki streak` : 'Aaj se shuru karo!';
+      const streakClass = streak > 0 ? 'active' : '';
+
+      return `<div class="habit-row">
+        <div class="habit-info">
+          <span class="habit-emoji">${h.emoji}</span>
+          <div class="habit-texts">
+            <div class="habit-name">${h.name}</div>
+            <div class="habit-streak-text ${streakClass}">${streakLabel}</div>
+          </div>
+          <button class="delete-btn" onclick="removeHabit(${h.id})" aria-label="Hatao">✕</button>
+        </div>
+        ${cells}
+      </div>`;
+    }).join('');
+
+    const pct = Math.round(todayDone / habits.length * 100);
+    document.getElementById('today-val').textContent = `${todayDone}/${habits.length}`;
+    document.getElementById('prog-bar').style.width = pct + '%';
+    document.getElementById('week-val').textContent = weekTotal ? Math.round(weekDone / weekTotal * 100) + '%' : '0%';
+    document.getElementById('total-val').textContent = habits.length;
+    document.getElementById('top-streak').textContent = Math.max(...habits.map(getStreak));
+  }
+
+  render();
+</script>
+</body>
+</html>
